@@ -1,5 +1,4 @@
 from threading import Thread
-import platform
 import requests
 import time
 import re
@@ -11,27 +10,18 @@ arquivo_tocrawl = pasta + '/to_crawl.txt'
 arquivo_crawled = pasta + '/crawled.txt'
 
 if 'to_crawl.txt' and 'crawled.txt' not in os.listdir(pasta):
-    c = 'https://compartilhe.info/listas/sites-inuteis-e-interessantes-para-gastar-tempo/\nhttps://falauniversidades.com.br/10-sites-bizarros-para-voce-passar-o-tempo-na-internet/\nhttps://pt.wikipedia.org/wiki/Brasil\nhttp://www.catolicoorante.com.br/oracao.php?id=6\nhttp://www.ofuxico.com.br/noticias-sobre-famosos/confira-o-clipe-oficial-da-cancao-salve-do-ex-bbb-viegas/2018/11/22-335469.html\nhttps://www.sbahq.org/curso-salve-uma-vida/\nhttps://piseagrama.org/salve-a-internet/\nhttps://www.merriam-webster.com/dictionary/salve\nhttps://poraqui.com/casa-forte/salve-o-bar-da-esquina-aposta-em-petiscos-exclusivos-e-drinks-bem-elaborados/'
+    print('[...] Criando arquivo de Backup [...]')
+    c = 'https://compartilhe.info/listas/sites-inuteis-e-interessantes-para-gastar-tempo/\nhttps://falauniversidades.com.br/10-sites-bizarros-para-voce-passar-o-tempo-na-internet/\nhttps://pt.wikipedia.org/wiki/Brasil\nhttp://www.catolicoorante.com.br/oracao.php?id=6\nhttp://www.ofuxico.com.br/noticias-sobre-famosos/confira-o-clipe-oficial-da-cancao-salve-do-ex-bbb-viegas/2018/11/22-335469.html\nhttps://www.sbahq.org/curso-salve-uma-vida/\nhttps://piseagrama.org/salve-a-internet/\nhttps://www.merriam-webster.com/dictionary/salve\nhttps://poraqui.com/casa-forte/salve-o-bar-da-esquina-aposta-em-petiscos-exclusivos-e-drinks-bem-elaborados/\nhttps://tudosobreposgraduacao.wordpress.com/2017/12/12/lista-de-links-ativos-para-o-sci-hub/\nhttps://www.fabricadenoobs.com.br/deep-web/listas-de-links/\nhttps://www.criarsites.com/como-colocar-lista-de-links-personalizada-no-blogger-ou-wordpress/\nhttps://viajantesolo.com.br/companhias-aereas/programa-de-milhagem-lista-de-links-das-companhias-aereas-para-se-inscrever\nhttps://helpdesk.e-goi.com/806078-O-E-goi-diz-que-tenho-dom%C3%ADnio-recente-ou-links-em-lista-negra-Socorro?r=1\nhttps://www.techtudo.com.br/dicas-e-tutoriais/noticia/2013/11/como-incluir-links-de-sites-na-lista-de-leitura-do-windows-81.html\nhttps://portal.fiocruz.br/caixa-editorial/materias-dialogos-pensesus-duplo-vertical-lista-links\nhttps://tableless.com.br/criando-um-menu-horizontal-com-css/\nhttp://www.embarquenaviagem.com/2014/09/13/diario-professor-divulga-uma-super-lista-com-links-sobre-o-meio-ambiente/'
 
-    if platform.system() == 'Windows':
-        os.system('copy NUL to_crawl.txt')
+    tlin = open(arquivo_tocrawl, 'w')
+    tlin.write(c)
+    tlin.close()
 
-        tlin = open(arquivo_tocrawl, 'w')
-        tlin.write(c)
-        tlin.close()
-
-        os.system('copy NUL crawled.txt')
-
-    elif platform.system() == 'Linux':
-        tlin = open(arquivo_tocrawl, 'w')
-        tlin.write(c)
-        tlin.close()
-
-        arqv = open('crawled.txt', 'w')
-        arqv.close()
+    arqv = open('crawled.txt', 'w')
+    arqv.close()
 
 else:
-    print('Arquivo salvo encontrado')
+    print('[*] Arquivo de Backup encontrado [*]')
 
 t_arquivo = open(arquivo_tocrawl, 'r')
 c_arquivo = open(arquivo_crawled, 'r')
@@ -60,15 +50,17 @@ def salvar():
                 S_tocrawl.write('\n')
 
         for j in range(c_lista):
-            if len(lista_crawl[i]) > 2:
+            if len(lista_crawl[j]) > 2:
                 S_crawled.write((lista_crawled[j]).encode('utf-8'))
                 S_crawled.write('\n')
 
         S_tocrawl.close()
         S_crawled.close()
 
+        print('[*] Progresso salvo ' + time.asctime() + ' [*]')
+
     except:
-        print('erro ao salvar o arquivo')
+        print('[!] Erro ao salvar o progresso [!]')
 
 def reset(url):
     try:
@@ -104,6 +96,7 @@ def analisar(url):
         html = req.text
 
     except:
+        print('[!] Nao foi possivel usar o Header [!]')
         try:
             req = requests.get(url)
             html = req.text
@@ -118,27 +111,52 @@ def analisar(url):
         if link not in crawled and link not in to_crawl:
             if re.findall('((\.br)|(\.com)|(\.net)|(\.org))$', str(url2)[:-2]):
                 to_crawl.append(link)
-                salvar()
+
     reset(url)
 
-
 def main():
-    print 'started at ', time.asctime()
+
+    print 'Started at ', time.asctime()
+    temporizador = 0
+
     while True:
+        if temporizador == 20:
+            salvar()
+            temporizador = 0
+
         url1 = to_crawl[0]
         url2 = to_crawl[3]
         url3 = to_crawl[5]
         url4 = to_crawl[8]
+        url5 = to_crawl[10]
+        url6 = to_crawl[12]
+        url7 = to_crawl[14]
+        url8 = to_crawl[15]
+        url9 = to_crawl[16]
+        url10 = to_crawl[17]
 
         t_analisar1 = Thread(target=analisar(url1))
         t_analisar2 = Thread(target=analisar(url2))
         t_analisar3 = Thread(target=analisar(url3))
         t_analisar4 = Thread(target=analisar(url4))
+        t_analisar5 = Thread(target=analisar(url5))
+        t_analisar6 = Thread(target=analisar(url6))
+        t_analisar7 = Thread(target=analisar(url7))
+        t_analisar8 = Thread(target=analisar(url8))
+        t_analisar9 = Thread(target=analisar(url9))
+        t_analisar10 = Thread(target=analisar(url10))
 
         t_analisar1.start()
         t_analisar2.start()
         t_analisar3.start()
         t_analisar4.start()
+        t_analisar5.start()
+        t_analisar6.start()
+        t_analisar7.start()
+        t_analisar8.start()
+        t_analisar9.start()
+        t_analisar10.start()
 
+        temporizador += 1
 
 main()
