@@ -34,23 +34,22 @@ c_arquivo.close()
 
 def salvar():
 
-    lista_crawl = to_crawl
     lista_crawled = list(crawled)
 
-    t_lista = len(lista_crawl) - 1
-    c_lista = len(lista_crawled) - 1
+    t_lista = len(to_crawl) - 1
+    c_lista = len(crawled) - 1
 
     try:
         S_tocrawl = open(arquivo_tocrawl, 'w')
         S_crawled = open(arquivo_crawled, 'w')
 
         for i in range(t_lista):
-            if len(lista_crawl[i]) > 2:
-                S_tocrawl.write(lista_crawl[i].encode('utf-8'))
+            if len(to_crawl[i]) > 2:
+                S_tocrawl.write(to_crawl[i].encode('utf-8'))
                 S_tocrawl.write('\n')
 
         for j in range(c_lista):
-            if len(lista_crawl[j]) > 2:
+            if len(lista_crawled[j]) > 2:
                 S_crawled.write((lista_crawled[j]).encode('utf-8'))
                 S_crawled.write('\n')
 
@@ -67,20 +66,15 @@ def reset(url):
         to_crawl.remove(url)
         crawled.add(url)
     except:
+        print('[!] Erro ao resetar url [!]')
         return
 
-def headers(url):
-    url2 = re.findall('https?:\/\/([^"\'/]*)', url)
+def headers(dominio):
 
-    if 'twitter.com' or 'www.twitter.com' == url2:
-        header = {
-            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/70.0.3538.77 Chrome/70.0.3538.77 Safari/537.36',
-            'referer': 'https://twitter.com/login/error?username_or_email=deathnote.hard%40gmail.com&redirect_after_login=%2F%3Flang%3Dpt-br',
-            'cookie': ''}
-    elif 'www.instagram.com' or 'instagram.com' == url2:
-        header = {
-            'cookie': '',
-            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/70.0.3538.77 Chrome/70.0.3538.77 Safari/537.36'}
+    if 'twitter.com' or 'www.twitter.com' == dominio:
+        header = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/70.0.3538.77 Chrome/70.0.3538.77 Safari/537.36','referer': 'https://twitter.com/login/error?username_or_email=deathnote.hard%40gmail.com&redirect_after_login=%2F%3Flang%3Dpt-br','cookie': ''}
+    elif 'www.instagram.com' or 'instagram.com' == dominio:
+        header = {'cookie': '','user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/70.0.3538.77 Chrome/70.0.3538.77 Safari/537.36'}
     else:
         header = {'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/70.0.3538.77 Chrome/70.0.3538.77 Safari/537.36'}
 
@@ -89,9 +83,10 @@ def headers(url):
 def analisar(url):
 
     print(url)
+    dominio = re.findall('https?:\/\/([^"\'/]*)', url)
 
     try:
-        header = headers(url)
+        header = headers(dominio)
         req = requests.get(url, headers=header)
         html = req.text
 
@@ -105,11 +100,10 @@ def analisar(url):
             return
 
     links = re.findall(r'href="?\'?(https?:\/\/[^"\'>]*)', html)
-    url2 = re.findall('https?:\/\/([^"\'/]*)', url)
 
     for link in links:
         if link not in crawled and link not in to_crawl:
-            if re.findall('((\.br)|(\.com)|(\.net)|(\.org))$', str(url2)[:-2]):
+            if re.findall('((\.br)|(\.com)|(\.net)|(\.org))$', str(dominio)[:-2]):
                 to_crawl.append(link)
 
     reset(url)
